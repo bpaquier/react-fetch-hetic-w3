@@ -5,6 +5,7 @@ security:
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         # used to reload user from session & other features (e.g. switch_user)
+        users_in_memory: { memory: null }
         app_user_provider:
             entity:
                 class: App\Entity\User
@@ -15,8 +16,13 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            stateless: true
             lazy: true
             provider: app_user_provider
+            custom_authenticator:
+                - App\Security\AppAuthenticator
+                - App\Security\JWTAuthenticator
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

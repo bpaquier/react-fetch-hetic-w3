@@ -1,24 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+
+import "./App.css";
+import Login from "./Components/Login";
+import PostsList from "./Components/PostsList";
+import Header from "./Components/Header";
+import { PostsForm } from "./Components/PostForm";
 
 function App() {
+  const [isConnected, setIsConnected] = useState(false);
+  const [displayLogin, setDisplayLogin] = useState(true);
+
+  useEffect(() => {
+    Cookies.get("token") && setIsConnected(true);
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Header
+        {...{ isConnected, displayLogin, setDisplayLogin, setIsConnected }}
+      />
+      {!isConnected && (
+        <>
+          {displayLogin ? <Login {...{ setIsConnected }} /> : <p>register</p>}
+        </>
+      )}
+      {isConnected && <PostsForm {...{ setIsConnected }} />}
+      <PostsList />
     </div>
   );
 }

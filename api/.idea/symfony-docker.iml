@@ -74,6 +74,8 @@
       <excludeFolder url="file://$MODULE_DIR$/symfony_project/vendor/jms/serializer" />
       <excludeFolder url="file://$MODULE_DIR$/symfony_project/vendor/jms/serializer-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/symfony_project/vendor/jms/metadata" />
+      <excludeFolder url="file://$MODULE_DIR$/symfony_project/vendor/firebase/php-jwt" />
+      <excludeFolder url="file://$MODULE_DIR$/symfony_project/vendor/nelmio/cors-bundle" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

@@ -1,0 +1,20 @@
+.postsWrapper {
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ margin-top: 50px;
+}
+.title {
+  margin-bottom: 30px;
+}
+
+.post {
+  width: 80%;
+  padding: 20px 30px;
+  border-radius: 10px;
+
+}
+
+.post:nth-child(even) {
+  background-color: rgba(0,0,0,0.04);
+}

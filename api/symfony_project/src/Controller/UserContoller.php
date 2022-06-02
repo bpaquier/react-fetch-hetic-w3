@@ -11,21 +11,34 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 class UserContoller extends AbstractController
 {
     private $hasher;
+
     public function __construct(UserPasswordHasherInterface $hasher)
     {
         $this->hasher = $hasher;
     }
 
     /**
-     * @Route("/sign-in")
-     * @return Response
+     * @Route("/login", name="app_login", methods="POST")
+     * @return JsonResponse
      */
-    public function signIn()
+    public function Login(EntityManagerInterface $entityManager, ApiJWTController $apiJWTController)
     {
-        return  $this->json(["hello" => "world"]);
+        $user = $this->getUser();
+        $userData = $user->getUserInfos();
+
+
+        $jwt = $apiJWTController->createJWT($userData);
+
+        $resp = [
+            "status" => "ok",
+            "token" => $jwt,
+        ];
+
+        return  new JsonResponse($resp, 200);
     }
 
     /**
@@ -48,16 +61,18 @@ class UserContoller extends AbstractController
             $entityManager->flush();
 
             $payload = ['status' => 'ok'];
+            $status = 200;
         } else {
             $payload = [
-                'status' => 'not ok',
+                'status' => 'error',
                 'message' => 'missing key'
             ];
+            $status = 503;
         }
 
 
 
 
-        return $this->json($payload);
+        return $this->json($payload, $status);
     }
 }

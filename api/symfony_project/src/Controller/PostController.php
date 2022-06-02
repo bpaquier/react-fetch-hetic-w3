@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Factory\JsonResponseFactory;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 
 
 /**
@@ -42,30 +43,41 @@ class PostController extends AbstractController
      * @Route("/newPost", methods="POST")
      * @param EntityManagerInterface $entityManager
      * @return JsonResponse
+
      */
     public function addPost(EntityManagerInterface $entityManager, Request $request)
     {
-        $title = $request->request->get('title');
-        $content = $request->request->get('content');
-        if(isset($title) && isset($content)) {
-            $userRepo = $entityManager->getRepository(User::class);
-            $user = $userRepo->find(10);
+        $user = $this->getUser();
+        if($user) {
+            $title = $request->request->get('title');
+            $content = $request->request->get('content');
+            if(isset($title) && isset($content)) {
+                $post = new Post();
+                $post->setTitle($title);
+                $post->setContent($content);
+                $post->setUser($user);
+                $entityManager->persist($post);
+                $entityManager->flush();
 
-            $post = new Post();
-            $post->setTitle($title);
-            $post->setContent($content);
-            $post->setUser($user);
-            $entityManager->persist($post);
-            $entityManager->flush();
-
-            $payload = ['status' => 'ok'];
-        } else{
-            $payload = [
-                'status' => 'not ok',
-                'message' => 'missing key'
+                $payload = ['status' => 'ok'];
+                $status = 200;
+            } else{
+                $payload = [
+                    'status' => 'error',
+                    'message' => 'missing key'
+                ];
+                $status = 503;
+            }
+        } else {
+            $payload= [
+                'status' => 'error',
+                "message" => "access-denied"
             ];
+            $status = 401;
         }
 
-        return $this->json($payload);
+
+
+        return $this->json($payload, $status);
     }
 }
