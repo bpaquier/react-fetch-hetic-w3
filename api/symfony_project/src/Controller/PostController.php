@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Post;
-use App\Entity\Posts;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,23 +45,27 @@ class PostController extends AbstractController
      */
     public function addPost(EntityManagerInterface $entityManager, Request $request)
     {
-
-
         $title = $request->request->get('title');
         $content = $request->request->get('content');
+        if(isset($title) && isset($content)) {
+            $userRepo = $entityManager->getRepository(User::class);
+            $user = $userRepo->find(10);
 
-        $userRepo = $entityManager->getRepository(User::class);
-        $user = $userRepo->find(10);
+            $post = new Post();
+            $post->setTitle($title);
+            $post->setContent($content);
+            $post->setUser($user);
+            $entityManager->persist($post);
+            $entityManager->flush();
 
-        $post = new Post();
-        $post->setTitle($title);
-        $post->setContent($content);
-        $post->setUser($user);
+            $payload = ['status' => 'ok'];
+        } else{
+            $payload = [
+                'status' => 'not ok',
+                'message' => 'missing key'
+            ];
+        }
 
-        $entityManager->persist($post);
-        $entityManager->flush();
-
-        $payload = ['status' => 'ok'];
         return $this->json($payload);
     }
 }
