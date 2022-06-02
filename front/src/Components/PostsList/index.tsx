@@ -3,13 +3,17 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./styles.css";
 
-export default function PostsList() {
+export interface PostsListProps {
+  forceRefreshList?: boolean;
+}
+
+export default function PostsList({ forceRefreshList }: PostsListProps) {
   const [posts, setPosts] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     getPosts();
-  }, []);
+  }, [forceRefreshList]);
 
   const getPosts = () => {
     axios({

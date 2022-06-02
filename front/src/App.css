@@ -23,3 +23,8 @@
   width: 100%;
   margin-bottom: 20px !important;
 }
+
+.alertCenter {
+  margin: 40px auto;
+  margin-bottom: 0;
+}

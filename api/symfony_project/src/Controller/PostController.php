@@ -30,7 +30,7 @@ class PostController extends AbstractController
     {
         $repository = $entityManager->getRepository(Post::class);
 
-        $posts = $repository->findAll();
+        $posts = $repository->findBy([], ['id' => 'DESC']);
         $computedPosts = [];
 
         foreach ($posts as $post) {

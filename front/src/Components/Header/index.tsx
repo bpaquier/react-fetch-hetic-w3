@@ -1,3 +1,4 @@
+import jwt_decode from "jwt-decode";
 import Button from "@mui/material/Button";
 import Cookies from "js-cookie";
 
@@ -16,8 +17,10 @@ export default function Header({
   displayLogin,
   setIsConnected,
 }: HeaderProps) {
+  const userInfo = Cookies?.get("token") && jwt_decode(Cookies?.get("token"));
+  //@ts-ignore
+  const name = userInfo?.name ?? "You";
   const handleClick = () => {
-    console.log({ isConnected });
     if (isConnected) {
       Cookies.remove("token");
       setIsConnected(false);
@@ -27,7 +30,7 @@ export default function Header({
 
   return (
     <header className="header">
-      <p>{isConnected ? "Welcome" : "React fetch TP"}</p>
+      <p>{isConnected ? `Welcome ${name} !` : "React fetch TP"}</p>
       <Button color="inherit" variant="outlined" onClick={handleClick}>
         {isConnected ? "logout" : displayLogin ? "register" : "login"}
       </Button>

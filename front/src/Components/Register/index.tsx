@@ -4,18 +4,22 @@ import Cookies from "js-cookie";
 
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
+import { setConstantValue } from "typescript";
 
-export interface LoginProps {
+export interface RegisterProps {
   setIsConnected?(arg: boolean): void;
   setSuccess?(arg: string): void;
   setError?(arg: string): void;
+  setDisplayLogin?(arg: boolean): void;
 }
 
-export default function Login({
+export default function Register({
   setIsConnected,
   setSuccess,
   setError,
-}: LoginProps) {
+  setDisplayLogin,
+}: RegisterProps) {
+  const [nameValue, setNameValue] = useState(null);
   const [mailValue, setMailValue] = useState(null);
   const [passValue, setPassValue] = useState(null);
 
@@ -27,39 +31,49 @@ export default function Login({
     const formData = new FormData();
     mailValue && formData?.append("email", mailValue);
     passValue && formData?.append("password", passValue);
+    nameValue && formData?.append("name", nameValue);
 
     axios({
       method: "POST",
-      url: `${process.env.REACT_APP_API_URL}/login`,
+      url: `${process.env.REACT_APP_API_URL}/register`,
       data: formData,
     })
       .then((resp) => {
         if (resp.status === 200) {
-          setIsConnected(true);
-          Cookies.set("token", resp?.data?.token);
+          setDisplayLogin(true);
+          setSuccess("Success !! Please login :)");
         } else {
-          setError("Wrong email or password");
+          setError("Error when register, please try again or contact support");
         }
       })
       .catch(() => {
-        setError("Wrong email or password");
+        setError("Error when register, please try again or contact support");
       });
   };
   return (
     <div className="formWrapper">
-      <h2>Login</h2>
+      <h2>Register</h2>
       <form className="form">
+        <TextField
+          placeholder="Your Name"
+          className="input"
+          type="text"
+          onChange={(e) => setNameValue(e?.target?.value)}
+          value={nameValue}
+        />
         <TextField
           placeholder="Your email"
           className="input"
           type="mail"
           onChange={(e) => setMailValue(e?.target?.value)}
+          value={mailValue}
         />
         <TextField
           placeholder="Your password"
           className="input"
           type="password"
           onChange={(e) => setPassValue(e?.target?.value)}
+          value={passValue}
         />
         <Button
           type="submit"
@@ -67,9 +81,13 @@ export default function Login({
           variant="contained"
           sx={{ mt: 3, mb: 2 }}
           onClick={onSubmit}
-          disabled={mailValue?.length === 0 || passValue?.length === 0}
+          disabled={
+            mailValue?.length === 0 ||
+            passValue?.length === 0 ||
+            nameValue?.length === 0
+          }
         >
-          Login
+          Register
         </Button>
       </form>
     </div>

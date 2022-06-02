@@ -1,30 +1,33 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import TextField from "@mui/material/TextField";
 import { TextareaAutosize } from "@mui/material";
 import Button from "@mui/material/Button";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { Alert } from "@mui/material";
 
 export interface PostFormProps {
   setIsConnected?(arg: boolean): void;
+  setSuccess?(arg: string): void;
+  setError?(arg: string): void;
+  refreshList?(): void;
 }
 
-export function PostsForm({ setIsConnected }: PostFormProps) {
+export function PostsForm({
+  setIsConnected,
+  setSuccess,
+  setError,
+  refreshList,
+}: PostFormProps) {
   const [title, setTitle] = useState(null);
   const [content, setContent] = useState(null);
-  const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  useEffect(() => {
-    setError(false);
-    setSuccess(false);
-  }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log({ title, content });
+
+    setError(null);
+    setSuccess(null);
+
     const formData = new FormData();
     title && formData?.append("title", title);
     content && formData?.append("content", content);
@@ -39,19 +42,21 @@ export function PostsForm({ setIsConnected }: PostFormProps) {
         data: formData,
       })
         .then((resp) => {
-          console.log(resp?.status);
           if (resp?.status === 200) {
-            setSuccess(true);
+            setSuccess("Posted :)");
+            refreshList();
           } else if (resp?.status === 401) {
             setIsConnected(false);
-          } else if (resp?.status === 503) {
-            setError(true);
           }
         })
-        .catch((resp) => console.log(resp));
+        .catch(() => setIsConnected(false));
     } else {
       setIsConnected(false);
+      setSuccess("please relogin");
     }
+
+    setTitle(null);
+    setContent(null);
   };
 
   return (
@@ -63,18 +68,18 @@ export function PostsForm({ setIsConnected }: PostFormProps) {
           className="input"
           type="text"
           onChange={(e) => {
-            console.log(e?.target?.value);
             setTitle(e?.target?.value);
           }}
+          value={title}
         />
         <TextareaAutosize
           aria-label="content textarea"
           placeholder="Content"
           style={{ width: "100%", height: 100 }}
           onChange={(e) => {
-            console.log(e?.target?.value);
             setContent(e?.target?.value);
           }}
+          value={content}
         />
         <Button
           type="submit"
@@ -87,8 +92,6 @@ export function PostsForm({ setIsConnected }: PostFormProps) {
           Submit
         </Button>
       </form>
-      {error && <Alert severity="error">Missing title and/or content</Alert>}
-      {success && <Alert severity="success">{"POSTED :)"}</Alert>}
     </div>
   );
 }
