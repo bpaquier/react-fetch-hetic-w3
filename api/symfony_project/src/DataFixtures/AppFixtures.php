@@ -16,8 +16,6 @@ class AppFixtures extends Fixture
         PostFactory::createMany(10, function() {
             return ['user' => UserFactory::random()];
         });
-        // $product = new Product();
-        // $manager->persist($product);
 
         $manager->flush();
     }
